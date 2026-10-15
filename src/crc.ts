@@ -18,7 +18,9 @@ export function appendCrc(withoutCrc: string): string {
   return prefix + crc16(prefix);
 }
 export function verifyCrc(payload: string): boolean {
-  const nodes = parseTlv(payload, {nested:false});
+  let nodes;
+  try { nodes = parseTlv(payload, {nested:false}); }
+  catch { return false; }
   const last = nodes.at(-1);
   if (!last || last.id !== '63' || last.length !== 4 || !/^[0-9A-Fa-f]{4}$/.test(last.value)) return false;
   if (nodes.filter(n => n.id === '63').length !== 1) return false;
