@@ -40,7 +40,7 @@ test('rejects unpaired Unicode surrogate', () => assert.throws(()=>parseTlv('590
 test('CRC verifies Unicode bytes and rejects modified payload', () => {
   const payload=appendCrc(serializeTlv([{id:'00',value:'01'},{id:'59',value:'ශ්'}]));
   assert.equal(verifyCrc(payload),true);
-  const corrupted=payload.replace('ශ්','ම');
+  const corrupted=payload.replace('ශ්','මං');
   assert.equal(verifyCrc(corrupted),false);
 });
 test('CRC must appear last',()=>assert.equal(verifyCrc('630429B1000201'),false));
