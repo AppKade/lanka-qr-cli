@@ -21,8 +21,10 @@ export interface ParseOptions {
   maxBytes?: number;
 }
 export class TlvParseError extends Error {
-  constructor(message: string, readonly offset: number) {
+  readonly offset: number;
+  constructor(message: string, offset: number) {
     super(`${message} at UTF-8 byte offset ${offset}`);
+    this.offset = offset;
     this.name = 'TlvParseError';
   }
 }
