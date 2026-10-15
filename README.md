@@ -18,7 +18,7 @@ An open-source, offline-first TypeScript toolkit for EMVCo Merchant-Presented Mo
 </div>
 
 > [!IMPORTANT]
-> **Early developer preview, not a certified LANKAQR implementation.** The current code provides basic printable-ASCII TLV parsing and CRC-16 calculation/verification. It does **not** yet enforce complete EMVCo or CBSL LANKAQR rules, generate payment-ready QR images, verify merchant identities, or process payments. CRC validity is **not proof of a safe QR or a successful payment**. This project is not affiliated with, endorsed by, or certified by CBSL, LankaPay, or EMVCo.
+> **Early developer preview, not a certified LANKAQR implementation.** The current code provides Unicode-aware TLV parsing/serialization, CRC-16 calculation/verification and limited structural validation. It does **not** yet enforce complete EMVCo or CBSL LANKAQR rules, generate payment-ready QR images, verify merchant identities, or process payments. CRC validity is **not proof of a safe QR or a successful payment**. This project is not affiliated with, endorsed by, or certified by CBSL, LankaPay, or EMVCo.
 
 ## Why this project?
 
@@ -30,14 +30,15 @@ Payment QR payloads are compact strings containing structured payment data. Deve
 
 | Capability | Status |
 | --- | --- |
-| Read top-level two-digit TLV tags, lengths, values, and offsets (printable ASCII only) | ✅ Available |
-| Preserve duplicate top-level tags during parsing | ✅ Available |
+| Read TLV tags, Unicode-character lengths, and UTF-8 byte offsets | ✅ Available |
+| Preserve duplicate tags and parse recognized nested templates | ✅ Available |
 | Calculate CRC-16/CCITT-FALSE | ✅ Available |
 | Verify a final `63` CRC field and append a CRC programmatically | ✅ Available |
 | Parse text or a local file from the CLI | ✅ Available |
 | Unit tests and multi-OS GitHub Actions workflow | ✅ Configured |
-| Byte-aware, Unicode-capable and nested-template parsing | 🔜 Planned |
-| EMVCo field validation and versioned CBSL/LANKAQR profiles | 🔜 Planned |
+| Parse/serialize nested templates and Unicode values | ✅ Available on development branch |
+| Preview structural diagnostics (duplicate tags, format, initiation, CRC) | ✅ Available on development branch |
+| Comprehensive EMVCo and CBSL/LANKAQR validation profiles | 🔜 Planned |
 | QR generation, image rendering, advanced diagnostics, and public SDK packaging | 🔜 Planned |
 | Authorized acquiring-bank payment adapters and verified payment confirmation | 🔒 Later, partner-dependent |
 
@@ -83,15 +84,23 @@ Expected shape (shortened):
 ```json
 {
   "nodes": [
-    { "id": "00", "length": 2, "value": "01", "offset": 0 },
-    { "id": "53", "length": 3, "value": "144", "offset": 6 },
-    { "id": "58", "length": 2, "value": "LK", "offset": 13 }
+    { "id": "00", "length": 2, "value": "01", "offset": 0, "characterOffset": 0 },
+    { "id": "53", "length": 3, "value": "144", "offset": 6, "characterOffset": 6 },
+    { "id": "58", "length": 2, "value": "LK", "offset": 13, "characterOffset": 13 }
   ],
   "crcValid": false
 }
 ```
 
 That string is **test data**, not a complete or payment-ready LANKAQR payload.
+
+**Validate only basic structure (not CBSL compliance):**
+
+```bash
+npm run dev -- validate "<payload>"
+```
+
+See [core parser semantics](docs/CORE.md) for Unicode length and CRC details.
 
 **Parse from a file:**
 
