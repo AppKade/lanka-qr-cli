@@ -72,7 +72,7 @@ export type SerializableNode = { id: string; value?: string; children?: Serializ
 export function serializeTlv(nodes: readonly SerializableNode[]): string {
   return nodes.map(node => {
     if (!/^\d{2}$/.test(node.id)) throw new Error('A TLV ID must be exactly two digits');
-    if (node.value !== undefined && node.children !== undefined) throw new Error(`Tag ${node.id}: provide either value or children`);
+    if (node.value !== undefined && node.children !== undefined && serializeTlv(node.children) !== node.value) throw new Error(`Tag ${node.id}: value does not match serialized children`);
     const value = node.children !== undefined ? serializeTlv(node.children) : node.value;
     if (value === undefined) throw new Error(`Tag ${node.id}: value is required`);
     const len = Array.from(value).length;
