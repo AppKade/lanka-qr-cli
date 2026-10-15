@@ -1,0 +1,8 @@
+{
+  "merchantName": "Sample Store",
+  "merchantCity": "Colombo",
+  "merchantCategoryCode": "5999",
+  "merchantAccountId": "DEMO-ONLY",
+  "amount": "1500.00",
+  "reference": "ORDER-123"
+}

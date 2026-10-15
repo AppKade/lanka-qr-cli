@@ -18,7 +18,7 @@ An open-source, offline-first TypeScript toolkit for EMVCo Merchant-Presented Mo
 </div>
 
 > [!IMPORTANT]
-> **Early developer preview, not a certified LANKAQR implementation.** The current code provides Unicode-aware TLV parsing/serialization, CRC-16 calculation/verification and limited structural validation. It does **not** yet enforce complete EMVCo or CBSL LANKAQR rules, generate payment-ready QR images, verify merchant identities, or process payments. CRC validity is **not proof of a safe QR or a successful payment**. This project is not affiliated with, endorsed by, or certified by CBSL, LankaPay, or EMVCo.
+> **Early developer preview, not a certified LANKAQR implementation.** The current code provides Unicode-aware TLV parsing/serialization, CRC-16 calculation/verification and limited structural validation. It does **not** enforce complete EMVCo or CBSL LANKAQR rules, generate payment-ready merchant identifiers, verify merchants, or process payments. CRC validity is **not proof of a safe QR or a successful payment**. This project is not affiliated with, endorsed by, or certified by CBSL, LankaPay, or EMVCo.
 
 ## Why this project?
 
@@ -38,8 +38,10 @@ Payment QR payloads are compact strings containing structured payment data. Deve
 | Unit tests and multi-OS GitHub Actions workflow | ✅ Configured |
 | Parse/serialize nested templates and Unicode values | ✅ Available on development branch |
 | Preview structural diagnostics (duplicate tags, format, initiation, CRC) | ✅ Available on development branch |
-| Comprehensive EMVCo and CBSL/LANKAQR validation profiles | 🔜 Planned |
-| QR generation, image rendering, advanced diagnostics, and public SDK packaging | 🔜 Planned |
+| Partial EMVCo/LANKAQR field checks | ✅ Available (not certified) |
+| Complete CBSL 2026 rules and network verification | 🔜 Planned |
+| Synthetic test-payload generation and terminal/SVG/PNG rendering | ✅ Available |
+| Comprehensive diagnostics and public SDK publishing | 🔜 Planned |
 | Authorized acquiring-bank payment adapters and verified payment confirmation | 🔒 Later, partner-dependent |
 
 **Legend:** Available means implemented in the source, not independently certified. Configured means the workflow is present; check the CI badge for its latest execution result.
@@ -70,6 +72,17 @@ node dist/cli.js --help
 
 > [!NOTE]
 > The package is currently marked `private` and is **not published to npm**. Use the repository locally for now. Commands and APIs may change before the first public release.
+
+## Generate and render synthetic test QR codes
+
+```bash
+npm run dev -- generate --config examples/test-merchant.json --out sample.txt
+npm run dev -- validate --file sample.txt --profile lankaqr-basic
+npm run dev -- render --file sample.txt --format svg --out sample.svg
+npm run dev -- render --file sample.txt --format png --out sample.png
+```
+
+The demo uses `example.org` as a synthetic merchant-account namespace. **These codes are for testing only and cannot be used to accept real payments.** [Implementation details](docs/IMPLEMENTATION.md).
 
 ## CLI examples
 
