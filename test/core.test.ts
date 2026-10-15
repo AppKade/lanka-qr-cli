@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {crc16,appendCrc,verifyCrc} from '../src/crc.ts';
+import {parseTlv,TlvParseError} from '../src/tlv.ts';
+test('known CRC-16 vector',()=>assert.equal(crc16('123456789'),'29B1'));
+test('preserves duplicate tags and offsets',()=>assert.deepEqual(parseTlv('000201000202'),[{id:'00',length:2,value:'01',offset:0},{id:'00',length:2,value:'02',offset:6}]));
+test('rejects out of bounds lengths',()=>assert.throws(()=>parseTlv('0005AB'),TlvParseError));
+test('rejects Unicode pending byte-safe parser',()=>assert.throws(()=>parseTlv('5902ආ'),TlvParseError));
+test('appends and verifies checksum',()=>{const p=appendCrc('00020153031445802LK');assert.equal(verifyCrc(p),true);assert.equal(verifyCrc(p.slice(0,-1)+'0'),false)});
+test('CRC must be final field',()=>assert.equal(verifyCrc('630429B1000201'),false));
