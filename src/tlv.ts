@@ -28,11 +28,12 @@ export class TlvParseError extends Error {
     this.name = 'TlvParseError';
   }
 }
-function isTemplate(id: string): boolean {
+function isTemplate(id: string, parent: string | null): boolean {
   const num = Number(id);
+  if (parent !== null) return parent === '62' && num >= 50 && num <= 99;
   return (num >= 26 && num <= 51) || id === '62' || id === '64' || (num >= 80 && num <= 99);
 }
-function parseNodes(value: string, startByte: number, startCharacter: number, depth: number, nested: boolean, maxDepth: number): TlvNode[] {
+function parseNodes(value: string, startByte: number, startCharacter: number, depth: number, nested: boolean, maxDepth: number, parent: string | null): TlvNode[] {
   const chars = Array.from(value);
   const result: TlvNode[] = [];
   let pos = 0, byteOffset = startByte;
@@ -47,9 +48,10 @@ function parseNodes(value: string, startByte: number, startCharacter: number, de
     if (pos + 4 + length > chars.length) throw new TlvParseError('Declared value exceeds input length', currentOffset);
     const rawValue = chars.slice(pos + 4, pos + 4 + length).join('');
     const node: TlvNode = { id, length, value: rawValue, offset: currentOffset, characterOffset: startCharacter + pos };
-    if (nested && isTemplate(id)) {
+    // Interpret template IDs in context, never recursively guess from the ID.
+    if (nested && isTemplate(id, parent)) {
       if (depth >= maxDepth) throw new TlvParseError('Maximum TLV template nesting depth exceeded', currentOffset);
-      node.children = parseNodes(rawValue, currentOffset + 4, startCharacter + pos + 4, depth + 1, nested, maxDepth);
+      node.children = parseNodes(rawValue, currentOffset + 4, startCharacter + pos + 4, depth + 1, nested, maxDepth, id);
     }
     result.push(node);
     const rawField = chars.slice(pos, pos + 4 + length).join('');
@@ -68,7 +70,7 @@ export function parseTlv(input: string, options: ParseOptions = {}): TlvNode[] {
   if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(input)) {
     throw new TlvParseError('Input contains an unpaired Unicode surrogate', 0);
   }
-  return parseNodes(input, 0, 0, 0, options.nested ?? true, maxDepth);
+  return parseNodes(input, 0, 0, 0, options.nested ?? true, maxDepth, null);
 }
 export type SerializableNode = { id: string; value?: string; children?: SerializableNode[] };
 export function serializeTlv(nodes: readonly SerializableNode[]): string {

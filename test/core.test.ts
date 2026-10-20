@@ -60,3 +60,22 @@ test('invalid initiation method is rejected',()=>{
   const result=validateStructure(appendCrc('000201010299'));
   assert.ok(result.diagnostics.some(d=>d.code==='INITIATION_METHOD'));
 });
+
+// EMV template IDs are scoped to the root; child IDs are not nested templates.
+test('preserves opaque subfields even when their IDs match root template IDs', () => {
+  for (const id of ['26','62','64','80']) {
+    const payload = serializeTlv([{id, children:[{id:'26',value:'opaque identifier'}]}]);
+    const parsed = parseTlv(payload);
+    assert.equal(parsed[0]?.children?.[0]?.value, 'opaque identifier');
+    assert.equal(parsed[0]?.children?.[0]?.children, undefined);
+    assert.equal(serializeTlv(parsed), payload);
+  }
+});
+
+test('decodes payment-system templates only within additional data tag 62', () => {
+  const payload = serializeTlv([{id:'62',children:[{id:'50',children:[{id:'00',value:'example.org'}, {id:'62',value:'opaque'}]}]}]);
+  const nodes = parseTlv(payload);
+  assert.equal(nodes[0]?.children?.[0]?.children?.[1]?.value, 'opaque');
+  assert.equal(serializeTlv(nodes), payload);
+  assert.throws(() => parseTlv(payload, {maxDepth:1}), TlvParseError);
+});

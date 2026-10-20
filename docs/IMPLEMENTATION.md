@@ -27,3 +27,9 @@ npm run dev -- render --file sample.txt --format png --out sample.png
 - Payment processing, payment-status confirmation, refunds, settlement or authentication.
 
 References: https://www.emvco.com/emv-technologies/qr-codes/ and https://www.cbsl.gov.lk/en/node/20119 and https://www.cbsl.gov.lk/en/node/20562.
+
+## Parser and API boundary review
+
+Template decoding follows parent context: root templates and payment-system templates at `62[50..99]`. Data inside merchant or payment-system templates stays opaque unless explicitly structured. Context, roundtrip and depth-limit regressions cover the change.
+
+Generation validates runtime initiation and amount values when JSON bypasses TypeScript types. Rule validation and rendering refuse unsupported profiles/formats. CI uses a committed lockfile with `npm ci --ignore-scripts`. This does not add scheme certification or live payment routing.

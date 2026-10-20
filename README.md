@@ -8,7 +8,7 @@ An open-source, offline-first TypeScript toolkit for EMVCo Merchant-Presented Mo
 
 [![CI](https://github.com/AppKade/lanka-qr-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/AppKade/lanka-qr-cli/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](package.json)
+[![Node.js](https://img.shields.io/badge/Node.js-22.18%2B-339933?logo=node.js&logoColor=white)](package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](package.json)
 [![Status](https://img.shields.io/badge/status-early%20development-orange)](https://github.com/AppKade/lanka-qr-cli/issues)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -48,7 +48,7 @@ Payment QR payloads are compact strings containing structured payment data. Deve
 
 ## Quick start
 
-**Prerequisites:** Node.js 22+ and npm.
+**Prerequisites:** Node.js 22.18+ and npm.
 
 ```bash
 git clone https://github.com/AppKade/lanka-qr-cli.git

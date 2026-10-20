@@ -17,6 +17,7 @@ export function generateTestPayload(options: TestPayloadOptions): string {
   for (const [name,value] of Object.entries({merchantName,merchantCity,merchantCategoryCode,merchantAccountId})) {
     if (!value || typeof value!=='string') throw new Error(`${name} must be a non-empty string`);
   }
+  if (!['11','12'].includes(initiation)) throw new Error('initiation must be 11 or 12');
   if (!/^\d{4}$/.test(merchantCategoryCode)) throw new Error('merchantCategoryCode must contain 4 digits');
   if (Array.from(merchantName).length>25 || Array.from(merchantCity).length>15) throw new Error('Merchant name or city exceeds EMVCo length limits');
   if (amount !== undefined && !validatePaymentFields(amount)) throw new Error('Invalid amount format: expected positive numeric value');
