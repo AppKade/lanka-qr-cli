@@ -1,4 +1,4 @@
-import { parseTlv, TlvParseError, type TlvNode } from './tlv.ts';
+import { type TlvNode } from './tlv.ts';
 import { validateStructure, type Diagnostic } from './validate.ts';
 import { validatePaymentFields } from './payment-fields.ts';
 
@@ -12,6 +12,7 @@ export interface RulesResult {
 }
 const check=(nodes:TlvNode[],id:string)=>nodes.find(node=>node.id===id);
 export function validateRules(payload:string,profile:RuleProfile='emvco-baseline'):RulesResult {
+  if (!['emvco-baseline','lankaqr-basic'].includes(profile)) throw new Error('Unsupported profile');
   const structural=validateStructure(payload);
   const diagnostics=[...structural.diagnostics];
   if (!structural.valid && structural.diagnostics.some(d=>d.code==='TLV_MALFORMED')) return {valid:false,profile,scope:'partial',diagnostics};

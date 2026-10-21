@@ -51,3 +51,12 @@ test('QR renderer produces SVG and PNG',async()=>{
   assert.equal(Buffer.isBuffer(png),true);
   assert.equal((png as Buffer).subarray(0,8).toString('hex'),'89504e470d0a1a0a');
 });
+
+test('public APIs reject invalid runtime options rather than silently changing intent', async () => {
+  assert.throws(() => generateTestPayload({...sample, initiation:'99' as '11'}), /initiation/);
+  for (const amount of [1, null, {}, true]) {
+    assert.throws(() => generateTestPayload({...sample, amount:amount as unknown as string}), /amount/);
+  }
+  assert.throws(() => validateRules(generateTestPayload(sample), 'typo' as 'emvco-baseline'), /profile/);
+  await assert.rejects(renderQr('test', 'typo' as 'svg'), /formats/);
+});
